@@ -9,13 +9,17 @@ spring:
     driver-class-name: org.postgresql.Driver
   jpa:
     hibernate:
-      ddl-auto: update
+      ddl-auto: validate
     show-sql: ${JPA_SHOW_SQL:false}
     properties:
       hibernate:
         format_sql: true
         dialect: org.hibernate.dialect.PostgreSQLDialect
     open-in-view: false
+  flyway:
+    enabled: true
+    locations: classpath:db/migration
+    baseline-on-migrate: true
   jackson:
     property-naming-strategy: SNAKE_CASE
 
@@ -23,6 +27,8 @@ logging:
   level:
     root: INFO
     com.shopify.dashboard: DEBUG
+  pattern:
+    level: "%5p"
 
 app:
   security:
@@ -33,9 +39,23 @@ app:
     api-version: ${SHOPIFY_API_VERSION:2024-10}
     webhook-secret: ${SHOPIFY_WEBHOOK_SECRET:changeme-verify}
     request-timeout-ms: ${SHOPIFY_REQUEST_TIMEOUT_MS:10000}
+    max-retries: ${SHOPIFY_MAX_RETRIES:3}
+    rate-limit-backoff-seconds: ${SHOPIFY_RATE_LIMIT_BACKOFF_SECONDS:5}
 
 management:
+  endpoint:
+    health:
+      probes:
+        enabled: true
+      show-details: when_authorized
   endpoints:
     web:
       exposure:
-        include: health,info
+        include: health,info,prometheus
+  metrics:
+    tags:
+      application: shopify-dashboard
+  prometheus:
+    metrics:
+      export:
+        enabled: true

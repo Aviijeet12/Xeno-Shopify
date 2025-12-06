@@ -1,0 +1,21 @@
+# Node / frontend artifacts
+node_modules/
+.next/
+dist/
+out/
+
+# Backend build output
+backend/target/
+
+# Environment files
+.env
+*.env
+**/.env
+backend/.env
+backend/.env.local
+backend/.env.*
+
+# IDE
+.vscode/
+.idea/
+.DS_Store

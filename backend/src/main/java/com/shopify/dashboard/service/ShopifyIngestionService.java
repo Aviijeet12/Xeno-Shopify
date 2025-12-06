@@ -10,6 +10,7 @@ import com.shopify.dashboard.entity.Customer;
 import com.shopify.dashboard.entity.Order;
 import com.shopify.dashboard.entity.Product;
 import com.shopify.dashboard.entity.Tenant;
+import com.shopify.dashboard.monitoring.SyncMetrics;
 import com.shopify.dashboard.repository.CustomerRepository;
 import com.shopify.dashboard.repository.OrderRepository;
 import com.shopify.dashboard.repository.ProductRepository;
@@ -17,10 +18,12 @@ import com.shopify.dashboard.repository.TenantRepository;
 import jakarta.transaction.Transactional;
 import java.math.BigDecimal;
 import java.time.Instant;
+import java.time.Duration;
 import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+import io.micrometer.core.annotation.Timed;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -37,19 +40,30 @@ public class ShopifyIngestionService {
     private final ProductRepository productRepository;
     private final TenantRepository tenantRepository;
     private final ObjectMapper objectMapper;
+    private final SyncMetrics syncMetrics;
 
     @Transactional
+    @Timed(value = "shopify.sync.tenant", extraTags = {"operation", "full"})
     public SyncResponse syncTenant(Tenant tenant) {
         Instant startedAt = Instant.now();
-        long customerCount = syncCustomers(tenant);
-        long orderCount = syncOrders(tenant);
-        long productCount = syncProducts(tenant);
-        tenant.setLastSyncAt(Instant.now());
-        tenantRepository.save(tenant);
-        return new SyncResponse(tenant.getId(), startedAt, tenant.getLastSyncAt(), customerCount, orderCount, productCount);
+        try {
+            long customerCount = syncCustomers(tenant);
+            long orderCount = syncOrders(tenant);
+            long productCount = syncProducts(tenant);
+            Instant finishedAt = Instant.now();
+            tenant.setLastSyncAt(finishedAt);
+            tenantRepository.save(tenant);
+            syncMetrics.recordSyncSuccess(tenant.getId(), customerCount, orderCount, productCount,
+                    Duration.between(startedAt, finishedAt));
+            return new SyncResponse(tenant.getId(), startedAt, finishedAt, customerCount, orderCount, productCount);
+        } catch (RuntimeException ex) {
+            syncMetrics.recordSyncFailure(tenant.getId(), ex);
+            throw ex;
+        }
     }
 
     @Transactional
+    @Timed(value = "shopify.sync.all-tenants", extraTags = {"operation", "scheduler"})
     public void syncAllTenants() {
         List<Tenant> tenants = tenantRepository.findAll();
         tenants.forEach(tenant -> {

@@ -1,0 +1,73 @@
+# Render Blueprint for Shopify Dashboard backend
+databases:
+  - name: shopify-dashboard-db
+    plan: starter
+    databaseName: shopify_dashboard
+    region: oregon
+    ipAllowList: []
+
+services:
+  - type: web
+    name: shopify-dashboard-backend
+    env: docker
+    plan: starter
+    autoDeploy: true
+    region: oregon
+    dockerfilePath: backend/Dockerfile
+    dockerContext: backend
+    healthCheckPath: /actuator/health
+    envVars:
+      - key: SPRING_PROFILES_ACTIVE
+        value: production
+      - key: SPRING_TESTCONTAINERS_ENABLED
+        value: "false"
+      - key: JAVA_TOOL_OPTIONS
+        value: "-XX:MaxRAMPercentage=75 -XX:+UseContainerSupport"
+      - key: DB_HOST
+        fromDatabase:
+          name: shopify-dashboard-db
+          property: host
+      - key: DB_PORT
+        fromDatabase:
+          name: shopify-dashboard-db
+          property: port
+      - key: DB_NAME
+        fromDatabase:
+          name: shopify-dashboard-db
+          property: database
+      - key: DB_USERNAME
+        fromDatabase:
+          name: shopify-dashboard-db
+          property: user
+      - key: DB_PASSWORD
+        fromDatabase:
+          name: shopify-dashboard-db
+          property: password
+      - key: JWT_SECRET
+        value: change-me-jwt-secret
+      - key: JWT_EXPIRATION_SECONDS
+        value: "3600"
+      - key: SHOPIFY_API_VERSION
+        value: "2024-10"
+      - key: SHOPIFY_WEBHOOK_SECRET
+        value: change-me-webhook-secret
+      - key: SHOPIFY_API_KEY
+        value: change-me-api-key
+      - key: SHOPIFY_API_SECRET
+        value: change-me-api-secret
+      - key: SHOPIFY_ACCESS_TOKEN
+        value: change-me-access-token
+      - key: SHOPIFY_HOST
+        value: your-shop.myshopify.com
+      - key: SHOPIFY_REQUEST_TIMEOUT_MS
+        value: "10000"
+      - key: SHOPIFY_MAX_RETRIES
+        value: "3"
+      - key: SHOPIFY_RATE_LIMIT_BACKOFF_SECONDS
+        value: "5"
+      - key: MANAGEMENT_ENDPOINTS_WEB_EXPOSURE_INCLUDE
+        value: "health,info,prometheus"
+      - key: SERVER_PORT
+        value: "8080"
+      - key: APP_BASE_URL
+        value: https://shopify-dashboard-backend.onrender.com

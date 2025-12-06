@@ -1,0 +1,16 @@
+spring:
+  application:
+    name: shopify-dashboard
+  cloud:
+    vault:
+      enabled: ${VAULT_ENABLED:false}
+      uri: ${VAULT_URI:http://localhost:8200}
+      token: ${VAULT_TOKEN:changeme}
+      scheme: ${VAULT_SCHEME:http}
+      authentication: TOKEN
+      kv:
+        enabled: true
+        backend: ${VAULT_KV_BACKEND:secret}
+        application-name: ${VAULT_APP_NAME:shopify-dashboard}
+      connection-timeout: ${VAULT_CONNECTION_TIMEOUT:5000}
+      read-timeout: ${VAULT_READ_TIMEOUT:5000}

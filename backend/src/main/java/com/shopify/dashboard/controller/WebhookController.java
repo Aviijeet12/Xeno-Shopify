@@ -4,6 +4,7 @@ import com.shopify.dashboard.config.AppProperties;
 import com.shopify.dashboard.dto.ApiResponse;
 import com.shopify.dashboard.entity.Tenant;
 import com.shopify.dashboard.exception.UnauthorizedException;
+import com.shopify.dashboard.monitoring.SyncMetrics;
 import com.shopify.dashboard.service.ShopifyIngestionService;
 import com.shopify.dashboard.service.TenantService;
 import com.shopify.dashboard.util.HmacVerifier;
@@ -27,29 +28,37 @@ public class WebhookController {
     private final AppProperties properties;
     private final TenantService tenantService;
     private final ShopifyIngestionService ingestionService;
+    private final SyncMetrics syncMetrics;
 
     @PostMapping("/shopify")
     public ResponseEntity<ApiResponse<Void>> handleWebhook(@RequestHeader("X-Shopify-Hmac-Sha256") String hmac,
                                                            @RequestHeader("X-Shopify-Topic") String topic,
                                                            @RequestHeader("X-Shopify-Shop-Domain") String shopDomain,
                                                            @RequestBody String payload) {
-        if (!hmacVerifier.isValid(payload, hmac, properties.getShopify().getWebhookSecret())) {
-            throw new UnauthorizedException("Invalid webhook signature");
+        boolean success = false;
+        String topicLabel = (topic == null || topic.isBlank()) ? "unknown" : topic;
+        try {
+            if (!hmacVerifier.isValid(payload, hmac, properties.getShopify().getWebhookSecret())) {
+                throw new UnauthorizedException("Invalid webhook signature");
+            }
+            Tenant tenant = tenantService.getTenantByDomain(shopDomain);
+            if (!StringUtils.hasText(topic)) {
+                log.warn("Webhook topic missing for tenant {}", tenant.getShopDomain());
+                return ResponseEntity.ok(ApiResponse.success(null, "Ignored"));
+            }
+            if (topic.startsWith("customers")) {
+                ingestionService.upsertCustomerFromWebhook(tenant, payload);
+            } else if (topic.startsWith("orders")) {
+                ingestionService.upsertOrderFromWebhook(tenant, payload);
+            } else if (topic.startsWith("products")) {
+                ingestionService.upsertProductFromWebhook(tenant, payload);
+            } else {
+                log.info("Unhandled Shopify topic {}", topic);
+            }
+            success = true;
+            return ResponseEntity.ok(ApiResponse.success(null, "Webhook processed"));
+        } finally {
+            syncMetrics.recordWebhookEvent(topicLabel, success);
         }
-        Tenant tenant = tenantService.getTenantByDomain(shopDomain);
-        if (!StringUtils.hasText(topic)) {
-            log.warn("Webhook topic missing for tenant {}", tenant.getShopDomain());
-            return ResponseEntity.ok(ApiResponse.success(null, "Ignored"));
-        }
-        if (topic.startsWith("customers")) {
-            ingestionService.upsertCustomerFromWebhook(tenant, payload);
-        } else if (topic.startsWith("orders")) {
-            ingestionService.upsertOrderFromWebhook(tenant, payload);
-        } else if (topic.startsWith("products")) {
-            ingestionService.upsertProductFromWebhook(tenant, payload);
-        } else {
-            log.info("Unhandled Shopify topic {}", topic);
-        }
-        return ResponseEntity.ok(ApiResponse.success(null, "Webhook processed"));
     }
 }

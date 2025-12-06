@@ -26,5 +26,7 @@ public class AppProperties {
         private String apiVersion;
         private String webhookSecret;
         private long requestTimeoutMs;
+        private int maxRetries = 3;
+        private long rateLimitBackoffSeconds = 5;
     }
 }

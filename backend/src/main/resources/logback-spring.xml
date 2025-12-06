@@ -1,0 +1,29 @@
+<configuration scan="true">
+    <springProperty scope="context" name="LOG_LEVEL_PATTERN" source="logging.pattern.level" defaultValue="%5p"/>
+
+    <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder class="net.logstash.logback.encoder.LoggingEventCompositeJsonEncoder">
+            <providers>
+                <timestamp>
+                    <timeZone>UTC</timeZone>
+                </timestamp>
+                <pattern>
+                    <pattern>{"level":"%level","logger":"%logger{36}","thread":"%thread"}</pattern>
+                </pattern>
+                <arguments/>
+                <context/>
+                <logLevel/>
+                <message/>
+                <stackTrace/>
+            </providers>
+        </encoder>
+    </appender>
+
+    <root level="INFO">
+        <appender-ref ref="CONSOLE"/>
+    </root>
+
+    <logger name="com.shopify.dashboard" level="DEBUG" additivity="false">
+        <appender-ref ref="CONSOLE"/>
+    </logger>
+</configuration>
