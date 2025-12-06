@@ -9,6 +9,7 @@ public class AppProperties {
 
     private final Security security = new Security();
     private final Shopify shopify = new Shopify();
+    private final Admin admin = new Admin();
 
     @Data
     public static class Security {
@@ -28,5 +29,11 @@ public class AppProperties {
         private long requestTimeoutMs;
         private int maxRetries = 3;
         private long rateLimitBackoffSeconds = 5;
+    }
+
+    @Data
+    public static class Admin {
+        private String email;
+        private String password;
     }
 }

@@ -27,6 +27,8 @@ Set these in Render (Web Service → Environment):
 | `SPRING_TESTCONTAINERS_ENABLED` | Keep `false`; prevents Spring from trying to spin up Testcontainers during startup scripts. |
 | `JWT_SECRET` | Long random string used to sign dashboard JWTs. |
 | `JWT_EXPIRATION_SECONDS` | Token lifetime (defaults to `3600`). |
+| `ADMIN_EMAIL` | Platform admin account seeded on startup (used to obtain first JWT). |
+| `ADMIN_PASSWORD` | Plaintext password used once for the seeded admin (change after login). |
 | `SHOPIFY_API_KEY` | Shopify custom app API key. |
 | `SHOPIFY_API_SECRET` | Shopify custom app API secret. |
 | `SHOPIFY_ACCESS_TOKEN` | `shpat_…` token with read/write scopes for the store. |

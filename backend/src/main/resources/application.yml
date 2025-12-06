@@ -41,6 +41,9 @@ app:
     request-timeout-ms: ${SHOPIFY_REQUEST_TIMEOUT_MS:10000}
     max-retries: ${SHOPIFY_MAX_RETRIES:3}
     rate-limit-backoff-seconds: ${SHOPIFY_RATE_LIMIT_BACKOFF_SECONDS:5}
+  admin:
+    email: ${ADMIN_EMAIL:admin@xeno.dev}
+    password: ${ADMIN_PASSWORD:ChangeMe123!}
 
 management:
   endpoint:

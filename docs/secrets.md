@@ -4,7 +4,7 @@ This project supports two complementary approaches for managing sensitive config
 
 ## 1. Environment Variables / .env files
 
-- Copy `backend/.env.example` to `backend/.env` and fill in strong values for JWT, database, and Shopify keys.
+- Copy `backend/.env.example` to `backend/.env` and fill in strong values for JWT, admin bootstrap credentials, database, and Shopify keys.
 - Never commit `.env` – it is ignored via the repository `.gitignore`.
 - When running locally with Docker, VS Code, or IntelliJ, load the variables from `.env` or your shell environment.
 
