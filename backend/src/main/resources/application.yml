@@ -1,0 +1,41 @@
+server:
+  port: 8080
+
+spring:
+  datasource:
+    url: jdbc:postgresql://${DB_HOST:localhost}:${DB_PORT:5432}/${DB_NAME:shopify_dashboard}
+    username: ${DB_USERNAME:postgres}
+    password: ${DB_PASSWORD:postgres}
+    driver-class-name: org.postgresql.Driver
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: ${JPA_SHOW_SQL:false}
+    properties:
+      hibernate:
+        format_sql: true
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+    open-in-view: false
+  jackson:
+    property-naming-strategy: SNAKE_CASE
+
+logging:
+  level:
+    root: INFO
+    com.shopify.dashboard: DEBUG
+
+app:
+  security:
+    jwt:
+      secret: ${JWT_SECRET:change-this-secret}
+      expiration-seconds: ${JWT_EXPIRATION_SECONDS:3600}
+  shopify:
+    api-version: ${SHOPIFY_API_VERSION:2024-10}
+    webhook-secret: ${SHOPIFY_WEBHOOK_SECRET:changeme-verify}
+    request-timeout-ms: ${SHOPIFY_REQUEST_TIMEOUT_MS:10000}
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
