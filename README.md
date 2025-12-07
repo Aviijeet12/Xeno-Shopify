@@ -3,6 +3,7 @@
 Multi-tenant Shopify data ingestion backend (Spring Boot) with a Next.js dashboard for customer, order, and product insights. Built as the FDE internship assignment to demonstrate full-stack ownership: onboarding new stores, syncing Shopify data via REST/webhooks/schedulers, and surfacing KPIs with authentication.
 
 ## Live Demo
+- **Frontend (Vercel):** https://xeno-shopify-g2d11ve1c-avijitpratapsin-2613s-projects.vercel.app/
 - **Backend (Render):** https://xeno-shopify-peuv.onrender.com
 - **Dashboard (local dev):** http://localhost:3000 (see setup below)
 
