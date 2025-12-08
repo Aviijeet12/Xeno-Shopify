@@ -189,3 +189,53 @@ export async function getRecentOrders(tenantId: string, limit: number, token: st
 export async function triggerSync(tenantId: string, token?: string | null) {
   return apiRequest(`/api/tenants/${tenantId}/sync`, { method: "POST" }, token || undefined)
 }
+
+export interface ProductRecord {
+  id: string
+  shopProductId: number
+  title: string
+  price: number
+  createdAt: string
+  updatedAt?: string | null
+}
+
+interface ProductDto {
+  id: string
+  shopProductId: number
+  title: string
+  price: number
+  createdAt: string
+  updatedAt?: string | null
+}
+
+export interface CreateProductPayload {
+  title: string
+  price: number
+  shopProductId?: number
+}
+
+const mapProduct = (product: ProductDto): ProductRecord => ({
+  ...product,
+  price: Number(product.price || 0),
+})
+
+export async function getProducts(tenantId: string, token: string): Promise<ProductRecord[]> {
+  const data = await apiRequest<ProductDto[]>(`/api/${tenantId}/products`, { method: "GET" }, token)
+  return data.map(mapProduct)
+}
+
+export async function createProduct(
+  tenantId: string,
+  payload: CreateProductPayload,
+  token: string,
+): Promise<ProductRecord> {
+  const data = await apiRequest<ProductDto>(
+    `/api/${tenantId}/products`,
+    {
+      method: "POST",
+      body: JSON.stringify(payload),
+    },
+    token,
+  )
+  return mapProduct(data)
+}
