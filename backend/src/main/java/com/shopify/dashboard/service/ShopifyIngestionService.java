@@ -35,6 +35,7 @@ import org.springframework.util.CollectionUtils;
 public class ShopifyIngestionService {
 
     private final ShopifyClient shopifyClient;
+    private final MockShopifyDataService mockShopifyDataService;
     private final CustomerRepository customerRepository;
     private final OrderRepository orderRepository;
     private final ProductRepository productRepository;
@@ -76,7 +77,8 @@ public class ShopifyIngestionService {
     }
 
     public long syncCustomers(Tenant tenant) {
-        ShopifyCustomersResponse response = shopifyClient.fetchCustomers(tenant.getShopDomain(), tenant.getAccessToken());
+        ShopifyCustomersResponse response = mockShopifyDataService.customersFor(tenant.getShopDomain())
+                .orElseGet(() -> shopifyClient.fetchCustomers(tenant.getShopDomain(), tenant.getAccessToken()));
         if (response == null || CollectionUtils.isEmpty(response.customers())) {
             return 0;
         }
@@ -85,7 +87,8 @@ public class ShopifyIngestionService {
     }
 
     public long syncOrders(Tenant tenant) {
-        ShopifyOrdersResponse response = shopifyClient.fetchOrders(tenant.getShopDomain(), tenant.getAccessToken());
+        ShopifyOrdersResponse response = mockShopifyDataService.ordersFor(tenant.getShopDomain())
+                .orElseGet(() -> shopifyClient.fetchOrders(tenant.getShopDomain(), tenant.getAccessToken()));
         if (response == null || CollectionUtils.isEmpty(response.orders())) {
             return 0;
         }
@@ -94,7 +97,8 @@ public class ShopifyIngestionService {
     }
 
     public long syncProducts(Tenant tenant) {
-        ShopifyProductsResponse response = shopifyClient.fetchProducts(tenant.getShopDomain(), tenant.getAccessToken());
+        ShopifyProductsResponse response = mockShopifyDataService.productsFor(tenant.getShopDomain())
+                .orElseGet(() -> shopifyClient.fetchProducts(tenant.getShopDomain(), tenant.getAccessToken()));
         if (response == null || CollectionUtils.isEmpty(response.products())) {
             return 0;
         }

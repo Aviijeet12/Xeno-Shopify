@@ -1,0 +1,194 @@
+{
+  "tenants": [
+    {
+      "shopDomain": "home-decor",
+      "aliases": ["home-decor.myshopify.com", "decor-demo"],
+      "customers": {
+        "customers": [
+          {
+            "id": 810001,
+            "email": "nora@havenhome.com",
+            "first_name": "Nora",
+            "last_name": "Parsons",
+            "total_spent": "1840.50",
+            "created_at": "2024-05-10T14:05:00Z",
+            "updated_at": "2024-11-29T09:10:00Z"
+          },
+          {
+            "id": 810002,
+            "email": "rachel@tactilerow.com",
+            "first_name": "Rachel",
+            "last_name": "Gomez",
+            "total_spent": "920.00",
+            "created_at": "2024-06-18T11:45:00Z",
+            "updated_at": "2024-11-20T17:25:00Z"
+          },
+          {
+            "id": 810003,
+            "email": "devon@amberlane.com",
+            "first_name": "Devon",
+            "last_name": "Chu",
+            "total_spent": "1325.75",
+            "created_at": "2024-03-02T09:12:00Z",
+            "updated_at": "2024-11-11T13:40:00Z"
+          }
+        ]
+      },
+      "orders": {
+        "orders": [
+          {
+            "id": 910001,
+            "name": "HD-1041",
+            "total_price": "425.00",
+            "currency": "USD",
+            "created_at": "2024-11-24T10:45:00Z",
+            "updated_at": "2024-11-24T10:45:00Z"
+          },
+          {
+            "id": 910002,
+            "name": "HD-1042",
+            "total_price": "1189.00",
+            "currency": "USD",
+            "created_at": "2024-11-27T15:20:00Z",
+            "updated_at": "2024-11-27T15:20:00Z"
+          },
+          {
+            "id": 910003,
+            "name": "HD-1043",
+            "total_price": "247.00",
+            "currency": "USD",
+            "created_at": "2024-11-28T18:05:00Z",
+            "updated_at": "2024-11-28T18:05:00Z"
+          }
+        ]
+      },
+      "products": {
+        "products": [
+          {
+            "id": 710001,
+            "title": "Aurora Velvet Sofa",
+            "variants": [{ "price": "1899.00" }],
+            "created_at": "2024-01-08T12:00:00Z",
+            "updated_at": "2024-11-10T12:00:00Z"
+          },
+          {
+            "id": 710002,
+            "title": "Luna Ceramic Table Lamp",
+            "variants": [{ "price": "189.00" }],
+            "created_at": "2024-02-15T12:00:00Z",
+            "updated_at": "2024-10-05T12:00:00Z"
+          },
+          {
+            "id": 710003,
+            "title": "Cascade Rattan Lounge Chair",
+            "variants": [{ "price": "629.00" }],
+            "created_at": "2024-03-04T12:00:00Z",
+            "updated_at": "2024-09-12T12:00:00Z"
+          },
+          {
+            "id": 710004,
+            "title": "Harbor Knit Throw Blanket",
+            "variants": [{ "price": "98.00" }],
+            "created_at": "2024-04-22T12:00:00Z",
+            "updated_at": "2024-08-18T12:00:00Z"
+          }
+        ]
+      }
+    },
+    {
+      "shopDomain": "tech-gadgets",
+      "aliases": ["tech-gadgets.myshopify.com", "gadgets-lab"],
+      "customers": {
+        "customers": [
+          {
+            "id": 820001,
+            "email": "leo@quantumgrid.io",
+            "first_name": "Leo",
+            "last_name": "Martens",
+            "total_spent": "3120.00",
+            "created_at": "2024-04-19T10:05:00Z",
+            "updated_at": "2024-11-29T08:15:00Z"
+          },
+          {
+            "id": 820002,
+            "email": "mia@skywarelabs.com",
+            "first_name": "Mia",
+            "last_name": "Klein",
+            "total_spent": "1480.40",
+            "created_at": "2024-05-23T11:50:00Z",
+            "updated_at": "2024-11-21T11:50:00Z"
+          },
+          {
+            "id": 820003,
+            "email": "yara@voltpilot.io",
+            "first_name": "Yara",
+            "last_name": "Hassan",
+            "total_spent": "860.00",
+            "created_at": "2024-08-02T09:28:00Z",
+            "updated_at": "2024-11-18T14:32:00Z"
+          }
+        ]
+      },
+      "orders": {
+        "orders": [
+          {
+            "id": 920001,
+            "name": "TG-2241",
+            "total_price": "889.00",
+            "currency": "USD",
+            "created_at": "2024-11-23T13:15:00Z",
+            "updated_at": "2024-11-23T13:15:00Z"
+          },
+          {
+            "id": 920002,
+            "name": "TG-2242",
+            "total_price": "1299.00",
+            "currency": "USD",
+            "created_at": "2024-11-26T11:05:00Z",
+            "updated_at": "2024-11-26T11:05:00Z"
+          },
+          {
+            "id": 920003,
+            "name": "TG-2243",
+            "total_price": "349.00",
+            "currency": "USD",
+            "created_at": "2024-11-27T17:45:00Z",
+            "updated_at": "2024-11-27T17:45:00Z"
+          }
+        ]
+      },
+      "products": {
+        "products": [
+          {
+            "id": 720001,
+            "title": "Nebula Smart Speaker",
+            "variants": [{ "price": "249.00" }],
+            "created_at": "2024-02-01T12:00:00Z",
+            "updated_at": "2024-09-30T12:00:00Z"
+          },
+          {
+            "id": 720002,
+            "title": "Pulse XR Noise-Canceling Headphones",
+            "variants": [{ "price": "429.00" }],
+            "created_at": "2024-03-05T12:00:00Z",
+            "updated_at": "2024-10-10T12:00:00Z"
+          },
+          {
+            "id": 720003,
+            "title": "Lumen AR Glasses",
+            "variants": [{ "price": "1299.00" }],
+            "created_at": "2024-05-17T12:00:00Z",
+            "updated_at": "2024-11-05T12:00:00Z"
+          },
+          {
+            "id": 720004,
+            "title": "Ion Pro Power Bank",
+            "variants": [{ "price": "119.00" }],
+            "created_at": "2024-06-28T12:00:00Z",
+            "updated_at": "2024-11-12T12:00:00Z"
+          }
+        ]
+      }
+    }
+  ]
+}

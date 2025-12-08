@@ -75,6 +75,15 @@ flowchart LR
 2. Create `frontend/.env.local` (see comments in `frontend/lib/api.ts` for base URLs—by default it hits `http://localhost:8080`).
 3. `pnpm dev` (still inside `frontend/`) and open http://localhost:3000. Log in with the admin credentials, onboard a tenant, then open `/dashboard/{tenantId}`.
 
+### Demo Tenant Data
+The ingestion service now serves curated dummy datasets when certain domains are onboarded—handy for showcasing multi-tenant UX without hitting live Shopify stores.
+
+- **Fashion (existing sample):** any domain without the keywords below behaves like the default apparel store.
+- **Home Decor:** onboard a store whose domain contains `decor` or `home` (for example, `home-decor-demo.myshopify.com`). Syncing the tenant populates sofa/lighting/rugs products from `backend/src/main/resources/mock-data/mock-tenants.json`.
+- **Tech Gadgets:** domains containing `tech` or `gadget` (e.g., `tech-gadgets-lab.myshopify.com`) receive smart-speaker/headset inventory and matching customers/orders.
+
+Run `POST /api/tenants/{tenantId}/sync` (or use the UI “Sync” action) after onboarding to load the correct dataset for each tenant.
+
 ## API Quickstart
 ```bash
 # 1. Login (admin seeded from env)
