@@ -5,20 +5,41 @@ import { Crown, Mail, ShoppingBag } from "lucide-react"
 import { Avatar, AvatarFallback } from "@/components/ui/avatar"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { getTopCustomers, type TopCustomer } from "@/lib/api"
+import { useStore } from "@/lib/store"
 
 export function TopCustomersTable({ tenantId }: { tenantId: string }) {
   const [customers, setCustomers] = useState<TopCustomer[]>([])
   const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
+  const token = useStore((state) => state.token)
 
   useEffect(() => {
+    if (!token) return
+
+    let cancelled = false
     async function loadData() {
       setLoading(true)
-      const data = await getTopCustomers(tenantId, 5)
-      setCustomers(data)
-      setLoading(false)
+      setError(null)
+      try {
+        const data = await getTopCustomers(tenantId, 5, token)
+        if (!cancelled) {
+          setCustomers(data)
+        }
+      } catch (err) {
+        if (!cancelled) {
+          setError(err instanceof Error ? err.message : "Failed to load customers")
+        }
+      } finally {
+        if (!cancelled) {
+          setLoading(false)
+        }
+      }
     }
     loadData()
-  }, [tenantId])
+    return () => {
+      cancelled = true
+    }
+  }, [tenantId, token])
 
   const formatCurrency = (value: number) => {
     return new Intl.NumberFormat("en-US", {
@@ -42,6 +63,8 @@ export function TopCustomersTable({ tenantId }: { tenantId: string }) {
           <div className="h-[280px] flex items-center justify-center">
             <div className="w-6 h-6 border-2 border-primary border-t-transparent rounded-full animate-spin" />
           </div>
+        ) : error ? (
+          <div className="h-[280px] flex items-center justify-center text-sm text-destructive">{error}</div>
         ) : (
           <div className="space-y-3">
             {customers.map((customer, index) => (
@@ -75,10 +98,12 @@ export function TopCustomersTable({ tenantId }: { tenantId: string }) {
 
                 <div className="text-right">
                   <p className="text-sm font-medium text-foreground">{formatCurrency(customer.totalSpent)}</p>
-                  <p className="text-xs text-muted-foreground flex items-center justify-end gap-1">
-                    <ShoppingBag className="w-3 h-3" />
-                    {customer.orderCount}
-                  </p>
+                  {typeof customer.orderCount === "number" && (
+                    <p className="text-xs text-muted-foreground flex items-center justify-end gap-1">
+                      <ShoppingBag className="w-3 h-3" />
+                      {customer.orderCount}
+                    </p>
+                  )}
                 </div>
               </div>
             ))}

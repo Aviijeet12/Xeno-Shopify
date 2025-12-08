@@ -14,13 +14,14 @@ import { onboardTenant } from "@/lib/api"
 
 export default function NewTenantPage() {
   const router = useRouter()
-  const { token, addTenant } = useStore()
+  const { token, fetchTenants } = useStore()
   const [loading, setLoading] = useState(false)
   const [success, setSuccess] = useState(false)
+  const [error, setError] = useState<string | null>(null)
   const [formData, setFormData] = useState({
     shopDomain: "",
     accessToken: "",
-    email: "",
+    contactEmail: "",
   })
 
   useEffect(() => {
@@ -31,45 +32,23 @@ export default function NewTenantPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
+    if (!token) {
+      router.push("/login")
+      return
+    }
+
     setLoading(true)
+    setError(null)
 
     try {
-      await onboardTenant(formData)
-
-      const newTenant = {
-        id: `tenant-${Date.now()}`,
-        name: formData.shopDomain
-          .split(".")[0]
-          .replace(/-/g, " ")
-          .replace(/\b\w/g, (l) => l.toUpperCase()),
-        domain: formData.shopDomain,
-        status: "connected" as const,
-        lastSync: new Date().toISOString(),
-        email: formData.email,
-      }
-      addTenant(newTenant)
-
+      await onboardTenant(formData, token)
+      await fetchTenants()
       setSuccess(true)
       setTimeout(() => {
         router.push("/tenants")
       }, 2000)
-    } catch {
-      const newTenant = {
-        id: `tenant-${Date.now()}`,
-        name: formData.shopDomain
-          .split(".")[0]
-          .replace(/-/g, " ")
-          .replace(/\b\w/g, (l) => l.toUpperCase()),
-        domain: formData.shopDomain,
-        status: "connected" as const,
-        lastSync: new Date().toISOString(),
-        email: formData.email,
-      }
-      addTenant(newTenant)
-      setSuccess(true)
-      setTimeout(() => {
-        router.push("/tenants")
-      }, 2000)
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Failed to onboard store")
     } finally {
       setLoading(false)
     }
@@ -149,19 +128,21 @@ export default function NewTenantPage() {
                   </div>
 
                   <div className="space-y-2">
-                    <Label htmlFor="email" className="flex items-center gap-2">
+                    <Label htmlFor="contactEmail" className="flex items-center gap-2">
                       <Mail className="w-4 h-4 text-muted-foreground" />
                       Contact Email
                     </Label>
                     <Input
-                      id="email"
+                      id="contactEmail"
                       type="email"
                       placeholder="admin@yourstore.com"
-                      value={formData.email}
-                      onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                      value={formData.contactEmail}
+                      onChange={(e) => setFormData({ ...formData, contactEmail: e.target.value })}
                       required
                     />
                   </div>
+
+                  {error && <p className="text-sm text-destructive">{error}</p>}
 
                   <div className="flex gap-3 pt-4">
                     <Button type="button" variant="outline" onClick={() => router.push("/tenants")} className="flex-1">

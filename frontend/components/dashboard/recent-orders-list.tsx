@@ -7,20 +7,41 @@ import { Badge } from "@/components/ui/badge"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { getRecentOrders, type RecentOrder } from "@/lib/api"
 import { format } from "date-fns"
+import { useStore } from "@/lib/store"
 
 export function RecentOrdersList({ tenantId }: { tenantId: string }) {
   const [orders, setOrders] = useState<RecentOrder[]>([])
   const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
+  const token = useStore((state) => state.token)
 
   useEffect(() => {
+    if (!token) return
+
+    let cancelled = false
     async function loadData() {
       setLoading(true)
-      const data = await getRecentOrders(tenantId)
-      setOrders(data)
-      setLoading(false)
+      setError(null)
+      try {
+        const data = await getRecentOrders(tenantId, 10, token)
+        if (!cancelled) {
+          setOrders(data)
+        }
+      } catch (err) {
+        if (!cancelled) {
+          setError(err instanceof Error ? err.message : "Failed to load orders")
+        }
+      } finally {
+        if (!cancelled) {
+          setLoading(false)
+        }
+      }
     }
     loadData()
-  }, [tenantId])
+    return () => {
+      cancelled = true
+    }
+  }, [tenantId, token])
 
   const getStatusConfig = (status: RecentOrder["status"]) => {
     switch (status) {
@@ -63,6 +84,8 @@ export function RecentOrdersList({ tenantId }: { tenantId: string }) {
           <div className="h-48 flex items-center justify-center">
             <div className="w-6 h-6 border-2 border-primary border-t-transparent rounded-full animate-spin" />
           </div>
+        ) : error ? (
+          <div className="h-48 flex items-center justify-center text-sm text-destructive">{error}</div>
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full">
@@ -76,7 +99,8 @@ export function RecentOrdersList({ tenantId }: { tenantId: string }) {
               </thead>
               <tbody>
                 {orders.slice(0, 5).map((order) => {
-                  const statusConfig = getStatusConfig(order.status)
+                  const status = order.status || "synced"
+                  const statusConfig = getStatusConfig(status)
                   return (
                     <tr key={order.id} className="border-b border-border hover:bg-muted/30 transition-colors">
                       <td className="py-3 px-4 font-medium text-foreground">{order.orderNumber}</td>
@@ -88,7 +112,7 @@ export function RecentOrdersList({ tenantId }: { tenantId: string }) {
                       </td>
                       <td className="py-3 px-4">
                         <Badge variant="outline" className={statusConfig.className}>
-                          {order.status.charAt(0).toUpperCase() + order.status.slice(1)}
+                          {status.charAt(0).toUpperCase() + status.slice(1)}
                         </Badge>
                       </td>
                     </tr>

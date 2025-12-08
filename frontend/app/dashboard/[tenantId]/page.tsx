@@ -7,21 +7,44 @@ import { OrdersChart } from "@/components/dashboard/orders-chart"
 import { TopCustomersTable } from "@/components/dashboard/top-customers-table"
 import { RecentOrdersList } from "@/components/dashboard/recent-orders-list"
 import { getOverviewMetrics, type OverviewMetrics } from "@/lib/api"
+import { useStore } from "@/lib/store"
 
 export default function DashboardOverviewPage({ params }: { params: Promise<{ tenantId: string }> }) {
   const { tenantId } = use(params)
   const [metrics, setMetrics] = useState<OverviewMetrics | null>(null)
   const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
+  const token = useStore((state) => state.token)
 
   useEffect(() => {
+    if (!token) return
+
+    let cancelled = false
+
     async function loadMetrics() {
-      setLoading(true)
-      const data = await getOverviewMetrics(tenantId)
-      setMetrics(data)
-      setLoading(false)
+      try {
+        setLoading(true)
+        setError(null)
+        const data = await getOverviewMetrics(tenantId, token)
+        if (!cancelled) {
+          setMetrics(data)
+        }
+      } catch (err) {
+        if (!cancelled) {
+          setError(err instanceof Error ? err.message : "Failed to load metrics")
+        }
+      } finally {
+        if (!cancelled) {
+          setLoading(false)
+        }
+      }
     }
     loadMetrics()
-  }, [tenantId])
+
+    return () => {
+      cancelled = true
+    }
+  }, [tenantId, token])
 
   const formatCurrency = (value: number) => {
     return new Intl.NumberFormat("en-US", {
@@ -43,6 +66,8 @@ export default function DashboardOverviewPage({ params }: { params: Promise<{ te
         <h1 className="text-2xl font-semibold text-foreground">Overview</h1>
         <p className="text-muted-foreground">Your store performance at a glance</p>
       </div>
+
+      {error && <p className="text-sm text-destructive">{error}</p>}
 
       {/* Metric Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">

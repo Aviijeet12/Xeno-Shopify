@@ -5,7 +5,13 @@ Multi-tenant Shopify data ingestion backend (Spring Boot) with a Next.js dashboa
 ## Live Demo
 - **Frontend (Vercel):** https://xeno-shopify-g2d11ve1c-avijitpratapsin-2613s-projects.vercel.app/
 - **Backend (Render):** https://xeno-shopify-peuv.onrender.com
-- **Dashboard (local dev):** http://localhost:3000 (see setup below)
+- **Dashboard (local dev):** http://localhost:3000 (run from `frontend/`, see setup below)
+
+## Repository Layout
+- `backend/` – Spring Boot ingestion API + Render Docker deployment files
+- `frontend/` – Next.js dashboard (available at https://github.com/Aviijeet12/Xeno-Shopify/tree/main/frontend)
+- `docs/` – architecture notes, runbooks, deployment guides
+- `render.yaml` – Render blueprint wiring backend + Postgres
 
 ## Highlights
 - Tenant onboarding + JWT-protected APIs with role-based access.
@@ -64,10 +70,10 @@ flowchart LR
 2. Start Postgres and run migrations automatically via Spring: `cd backend && mvn spring-boot:run`
 3. On first boot an admin account is seeded from the env variables. Use `/auth/login` to retrieve a JWT and call authenticated APIs.
 
-### Frontend
-1. `pnpm install`
-2. Create `.env.local` (see comments in `lib/api.ts` for base URLs—by default it hits `http://localhost:8080`).
-3. `pnpm dev` and open http://localhost:3000. Log in with the admin credentials, onboard a tenant, then open `/dashboard/{tenantId}`.
+### Frontend (inside `frontend/`)
+1. `cd frontend && pnpm install`
+2. Create `frontend/.env.local` (see comments in `frontend/lib/api.ts` for base URLs—by default it hits `http://localhost:8080`).
+3. `pnpm dev` (still inside `frontend/`) and open http://localhost:3000. Log in with the admin credentials, onboard a tenant, then open `/dashboard/{tenantId}`.
 
 ## API Quickstart
 ```bash

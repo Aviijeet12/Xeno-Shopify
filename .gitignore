@@ -1,8 +1,12 @@
 # Node / frontend artifacts
 node_modules/
+frontend/node_modules/
 .next/
+frontend/.next/
 dist/
 out/
+frontend/dist/
+frontend/out/
 
 # Backend build output
 backend/target/

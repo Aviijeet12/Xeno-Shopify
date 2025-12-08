@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect } from "react"
+import { useEffect, useState } from "react"
 import { useRouter } from "next/navigation"
 import { Plus, Store, ExternalLink, Wifi, WifiOff, RefreshCw } from "lucide-react"
 import { Button } from "@/components/ui/button"
@@ -10,13 +10,38 @@ import { useStore } from "@/lib/store"
 
 export default function TenantsPage() {
   const router = useRouter()
-  const { token, tenants, setSelectedTenant } = useStore()
+  const { token, tenants, setSelectedTenant, fetchTenants } = useStore()
+  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
     if (!token) {
       router.push("/login")
+      return
     }
-  }, [token, router])
+
+    let cancelled = false
+    async function loadTenants() {
+      try {
+        setLoading(true)
+        setError(null)
+        await fetchTenants()
+      } catch (err) {
+        if (!cancelled) {
+          setError(err instanceof Error ? err.message : "Failed to load stores")
+        }
+      } finally {
+        if (!cancelled) {
+          setLoading(false)
+        }
+      }
+    }
+
+    loadTenants()
+    return () => {
+      cancelled = true
+    }
+  }, [token, router, fetchTenants])
 
   const handleOpenDashboard = (tenantId: string) => {
     setSelectedTenant(tenantId)
@@ -53,8 +78,21 @@ export default function TenantsPage() {
           </Button>
         </div>
 
+        {error && (
+          <Card className="mb-4 border-destructive/40">
+            <CardContent className="pt-4 text-destructive text-sm">{error}</CardContent>
+          </Card>
+        )}
+
         {/* Tenant Grid */}
-        {tenants.length > 0 ? (
+        {loading ? (
+          <Card className="text-center py-12">
+            <CardContent>
+              <div className="w-8 h-8 border-2 border-primary border-t-transparent rounded-full animate-spin mx-auto mb-4" />
+              <p className="text-muted-foreground">Loading your stores…</p>
+            </CardContent>
+          </Card>
+        ) : tenants.length > 0 ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {tenants.map((tenant) => {
               const statusConfig = getStatusConfig(tenant.status)

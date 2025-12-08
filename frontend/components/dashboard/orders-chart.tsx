@@ -9,29 +9,52 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { Calendar } from "@/components/ui/calendar"
 import { getOrderMetrics, type OrderMetric } from "@/lib/api"
 import { format, subDays } from "date-fns"
+import { useStore } from "@/lib/store"
 
 export function OrdersChart({ tenantId }: { tenantId: string }) {
   const [data, setData] = useState<OrderMetric[]>([])
   const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
   const [dateRange, setDateRange] = useState<{ from: Date; to: Date }>({
     from: subDays(new Date(), 30),
     to: new Date(),
   })
   const chartColor = "#0EA5E9"
+  const token = useStore((state) => state.token)
 
   useEffect(() => {
+    if (!token) return
+
+    let cancelled = false
     async function loadData() {
       setLoading(true)
-      const metrics = await getOrderMetrics(
-        tenantId,
-        format(dateRange.from, "yyyy-MM-dd"),
-        format(dateRange.to, "yyyy-MM-dd"),
-      )
-      setData(metrics)
-      setLoading(false)
+      setError(null)
+      try {
+        const metrics = await getOrderMetrics(
+          tenantId,
+          format(dateRange.from, "yyyy-MM-dd"),
+          format(dateRange.to, "yyyy-MM-dd"),
+          token,
+        )
+        if (!cancelled) {
+          setData(metrics)
+        }
+      } catch (err) {
+        if (!cancelled) {
+          setError(err instanceof Error ? err.message : "Failed to load order metrics")
+          setData([])
+        }
+      } finally {
+        if (!cancelled) {
+          setLoading(false)
+        }
+      }
     }
     loadData()
-  }, [tenantId, dateRange])
+    return () => {
+      cancelled = true
+    }
+  }, [tenantId, dateRange, token])
 
   return (
     <Card>
@@ -67,6 +90,8 @@ export function OrdersChart({ tenantId }: { tenantId: string }) {
             <div className="h-full flex items-center justify-center">
               <div className="w-6 h-6 border-2 border-primary border-t-transparent rounded-full animate-spin" />
             </div>
+          ) : error ? (
+            <div className="h-full flex items-center justify-center text-sm text-destructive">{error}</div>
           ) : (
             <ResponsiveContainer width="100%" height="100%">
               <AreaChart data={data} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
